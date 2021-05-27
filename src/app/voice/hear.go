@@ -1,13 +1,14 @@
-package main
+package voice
 
 import (
+	"assistant-jerome/src/app/actions"
+	"assistant-jerome/src/app/text"
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"github.com/gordonklaus/portaudio"
 	"log"
 	"time"
-
-	"github.com/gordonklaus/portaudio"
 )
 
 var audioRunning bool
@@ -135,7 +136,7 @@ reader:
 	return &buf, nil
 }
 
-func VoiceCommandHandler() {
+func CommandHandler() {
 
 	InitAudio()
 	defer FreeAudio()
@@ -155,25 +156,28 @@ func VoiceCommandHandler() {
 	fmt.Printf("recognizing...\n")
 	handling = true
 
-	gcp, err := NewGCPSpeechConv("../Assistant-Jerome-531b66d3c88f.json")
-	if err != nil {
-		log.Fatal(err)
+	convertedResponse := text.ConvertAudioToWitAiResponse(buf)
+	determineAction(convertedResponse)
+	CommandHandler()
+}
+
+func determineAction(witAiResponse *text.WitAiResponse) {
+
+	if len(witAiResponse.Outcomes) < 1 {
+		return
 	}
 
-	words, err := gcp.Convert(buf.Bytes())
-	if err != nil {
-		log.Fatal(err)
+	if len(witAiResponse.Outcomes[0].Entities.Intent) < 1 {
+		return
 	}
 
-	fmt.Printf("=> %s\n", words)
-	handling = false
-
-	// cmd := exec.Command("espeak", words)
-	// if err := cmd.Run(); err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	ner(words)
-
-	VoiceCommandHandler()
+	switch witAiResponse.Outcomes[0].Entities.Intent[0].Value {
+	case "greetings":
+		actions.Greet()
+	case "play_music":
+		//actions.PlayMusic(witAiResponse.Outcomes[0].Entities.SongTitle[0].Value,witAiResponse.Outcomes[0].Entities.Contact[0].Value)
+		actions.PlayMusics()
+	default:
+		actions.CommandUnknown()
+	}
 }

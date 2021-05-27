@@ -1,10 +1,14 @@
 package main
 
+import (
+	"assistant-jerome/src/app/text"
+	"assistant-jerome/src/app/voice"
+)
 func main() {
 	// initialize()
 	// initAudio()
-
-	VoiceCommandHandler()
+	text.InitSpeechToText()
+	voice.CommandHandler()
 	// go forever()
 	// select {}
 }
@@ -17,7 +21,7 @@ func main() {
 // 		}
 
 // 		if !handling {
-// 			VoiceCommandHandler()
+// 			CommandHandler()
 // 		}
 
 // 		time.Sleep(time.Second)
