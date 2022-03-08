@@ -24,8 +24,7 @@ func NewVAD(width int) *VAD {
 	}
 }
 
-// Given the samples, return the spectral flux value as compared
-// to the previous samples.
+// Flux Given the samples, return the spectral flux value as compared to the previous samples.
 func (v *VAD) Flux(samples []int16) float64 {
 	for i, s := range samples {
 		v.samples[i] = complex(float64(s), 0)
@@ -42,7 +41,7 @@ func (v *VAD) Flux(samples []int16) float64 {
 	var flux float64
 
 	for i, s := range v.spectrum {
-		flux += (s - v.lastSpectrum[i])
+		flux += s - v.lastSpectrum[i]
 	}
 
 	return flux

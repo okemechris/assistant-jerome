@@ -1,8 +1,8 @@
 package voice
 
 import (
-	"assistant-jerome/src/app/actions"
-	"assistant-jerome/src/app/text"
+	"assistant-jerome/actions"
+	"assistant-jerome/text"
 	"bytes"
 	"encoding/binary"
 	"fmt"
@@ -34,7 +34,6 @@ type State int
 const (
 	Waiting State = iota
 	Listening
-	Asking
 )
 
 type ListenOpts struct {
@@ -136,7 +135,7 @@ reader:
 	return &buf, nil
 }
 
-func CommandHandler() {
+func Listen() {
 
 	InitAudio()
 	defer FreeAudio()
@@ -157,8 +156,10 @@ func CommandHandler() {
 	handling = true
 
 	convertedResponse := text.ConvertAudioToWitAiResponse(buf)
+
 	determineAction(convertedResponse)
-	CommandHandler()
+
+	Listen()
 }
 
 func determineAction(witAiResponse *text.WitAiResponse) {
@@ -172,11 +173,12 @@ func determineAction(witAiResponse *text.WitAiResponse) {
 	}
 
 	switch witAiResponse.Outcomes[0].Entities.Intent[0].Value {
+
 	case "greetings":
 		actions.Greet()
 	case "play_music":
 		//actions.PlayMusic(witAiResponse.Outcomes[0].Entities.SongTitle[0].Value,witAiResponse.Outcomes[0].Entities.Contact[0].Value)
-		actions.PlayMusics()
+		actions.PlayMusic("","")
 	default:
 		actions.CommandUnknown()
 	}

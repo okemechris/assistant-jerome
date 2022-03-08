@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	speech "github.com/nicolaifsf/go-speak"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
-const API_KEY = "UKHKHD37C43H4ZUU65WBZNMXVJKOO6RO"
+const ApiKey = "UKHKHD37C43H4ZUU65WBZNMXVJKOO6RO"
 
 type WitAiContact struct {
 	Confidence float32 `json:"confidence"`
@@ -25,9 +24,9 @@ type WitAiIntent struct {
 }
 
 type WitAiEntities struct {
-	Contact []WitAiContact `json:"contact"`
-	Intent  []WitAiIntent  `json:"intent"`
-	SongTitle  []WitAiContact  `json:"song_title"`
+	Contact []WitAiContact    `json:"contact"`
+	Intent  []WitAiIntent     `json:"intent"`
+	SongTitle  []WitAiContact `json:"song_title"`
 }
 
 type WitAiOutcome struct {
@@ -41,9 +40,6 @@ type WitAiResponse struct {
 	Outcomes []WitAiOutcome `json:"outcomes"`
 }
 
-func InitSpeechToText() {
-	speech.SetWitKey(API_KEY) //Wit API Key MUST be set before calling any other Wit.AI functions
-}
 
 func ConvertAudioToWitAiResponse(speechByte *bytes.Buffer) *WitAiResponse {
 
@@ -71,7 +67,7 @@ func sendWitBuff(buffer *bytes.Buffer) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Set("Authorization", "Bearer "+API_KEY)
+	req.Header.Set("Authorization", "Bearer "+ApiKey)
 	req.Header.Set("Content-Type", "audio/raw;encoding=signed-integer;bits=16;rate=20k;endian=little")
 	res, err := client.Do(req)
 	if err != nil {
